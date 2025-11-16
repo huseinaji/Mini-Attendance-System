@@ -1,0 +1,117 @@
+services:
+  ##############################################
+  # PostgreSQL
+  ##############################################
+  postgres:
+    image: postgres:15
+    container_name: postgres-attendance
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: attendance
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+    networks:
+      - appnet
+
+  ##############################################
+  # Redis (event stream)
+  ##############################################
+  redis:
+    image: redis/redis-stack-server:latest
+    container_name: redis-stream
+    ports:
+      - "6379:6379"
+    networks:
+      - appnet
+  ##############################################
+  # Frontend
+  ##############################################
+  # frontend:
+  #   container_name: react-dev
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - "8001:8001"
+  #   volumes:
+  #     - .:/app       # untuk hot reload
+  #     - /app/node_modules  # hindari overwrite folder node_modules
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+
+  ##############################################
+  # NestJS API (Attendance + Report API)
+  ##############################################
+  api:
+    build:
+      context: ./mini-attendance-api
+      dockerfile: Dockerfile
+    container_name: nest-api
+    command: ["npm", "run", "start:dev"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      # Postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: root
+      DB_NAME: attendance
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    networks:
+      - appnet
+
+  ##############################################
+  # Go Worker (async processor)
+  ##############################################
+  worker:
+    build:
+      context: ./mini-attendance-worker
+      dockerfile: Dockerfile
+    container_name: go-worker
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    environment:
+      # Postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: root
+      DB_NAME: attendance
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    networks:
+      - appnet
+
+##############################################
+# Persistent volumes
+##############################################
+volumes:
+  pgdata:
+
+##############################################
+# Shared network
+##############################################
+networks:
+  appnet:
+    driver: bridge
