@@ -76,36 +76,36 @@ Project ini menggunakan komponen berikut:
 
 * Menyediakan endpoint seperti:
 
-  * `/auth/login`
-  * `/attendance/checkin`
-  * `/attendance/checkout`
-  * `/attendance/status-today`
+  * `/api/auth/signup`
+  * `/api/auth/login`
+  * `/api/auth/profile`
+  * `/api/user`
+  * `/api/attendance/checkin`
+  * `/api/attendance/checkout`
+  * `/api/attendace-summary`
 
 ### Go Worker
 
 * Mengkonsumsi Redis Streams `attendance_stream`
-* Memproses event menjadi summary harian
-* Menjalankan logic tambahan: keterlambatan, shift, overtime
+* Memproses event menjadi summary harian dan mencatat attendance
+* Menjalankan logic tambahan: present, late, early_leave
 
 ### React Frontend
 
 * Dashboard absensi
 * Real-time status check-in/checkout
-* Rekap hari ini
+* Rekap data
 
 ---
 
 ## 🔄 Alur Sistem
 
-1. User melakukan **check-in** melalui frontend → API mencatat ke Postgres → mem-publish event ke Redis Streams.
-2. Worker (Golang) membaca event → memproses → update summary.
-3. User melihat status kehadiran realtime dari React.
+1. User login (User dianggap employee) untuk mendapatkan access_token
+2. User melakukan **check-in** melalui frontend → API mencatat mem-publish event ke Redis Streams.
+3. Worker (Golang) membaca event → memproses →  simpan data checkin → update summary.
+4. User melihat status kehadiran realtime dari React.
 
 ---
-
-## 🧪 Pengembangan
-
-Untuk development cepat tanpa rebuild Docker image:
 
 ### Jalankan NestJS secara lokal
 
@@ -118,7 +118,7 @@ npm run start:dev
 
 ```
 cd mini-attendance-worker
-go run main.go
+go run .
 ```
 
 ### Frontend React
@@ -142,10 +142,11 @@ Pastikan **Redis dan PostgreSQL tetap dari Docker**.
 
 ## 📌 Todo
 
-* [ ] Tambah proteksi double check-in/check-out
-* [ ] Tambah JWT Auth proper
+* [ ] Integrasi frontend
+* [ ] Tambah WebSocket untuk update realtime ke frontend
+* [ ] Tambah cache system
 * [ ] Tambah summary mingguan/bulanan
-* [ ] Tambah WebSocket untuk update realtime
+* [ ] Manage Environtment 
 
 ---
 
@@ -153,4 +154,3 @@ Pastikan **Redis dan PostgreSQL tetap dari Docker**.
 
 Husein Aji Pratama
 
-Terima kasih sudah menggunakan project ini! Jika butuh update atau revisi, silakan minta 😊
