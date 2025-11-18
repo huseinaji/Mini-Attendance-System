@@ -32,12 +32,6 @@ root
 docker compose up --build
 ```
 
-Perintah ini akan:
-
-* Membangun image untuk API, Worker, dan Frontend
-* Menjalankan PostgreSQL dan Redis
-* Memulai semua container dalam 1 network `appnet`
-
 ### 2. Akses aplikasi
 
 | Service                  | URL                                            |
@@ -47,15 +41,12 @@ Perintah ini akan:
 
 ---
 
-
-
-### Worker (Go)
+### Environment Worker (Go)
 
 ```
 POSTGRE_URL=postgres://postgres:root@postgres:5432/attendance?sslmode=disable
 REDIS_URL=redis:6379
 ```
-
 
 ---
 
@@ -76,13 +67,13 @@ Project ini menggunakan komponen berikut:
 
 * Menyediakan endpoint seperti:
 
-  * `/api/auth/signup`
-  * `/api/auth/login`
-  * `/api/auth/profile`
-  * `/api/user`
-  * `/api/attendance/checkin`
-  * `/api/attendance/checkout`
-  * `/api/attendace-summary`
+  * `/api/auth/signup` *daftar user/employee baru*
+  * `/api/auth/login` *login user/employee*
+  * `/api/auth/profile` *cek user yang login sekarang*
+  * `/api/user` *cek semua user terdaftar*
+  * `/api/attendance/checkin` *checkin api*
+  * `/api/attendance/checkout` *checkout api*
+  * `/api/attendace-summary` *report attendance*
 
 ### Go Worker
 
@@ -128,8 +119,6 @@ cd web-frontend
 npm run dev
 ```
 
-Pastikan **Redis dan PostgreSQL tetap dari Docker**.
-
 ---
 
 ## 📝 Catatan Penting
@@ -143,9 +132,9 @@ Pastikan **Redis dan PostgreSQL tetap dari Docker**.
 ## 📌 Todo
 
 * [ ] Integrasi frontend
+* [ ] Unit testing backend
 * [ ] Tambah WebSocket untuk update realtime ke frontend
 * [ ] Tambah cache system
-* [ ] Tambah summary mingguan/bulanan
 * [ ] Manage Environtment 
 
 ---
