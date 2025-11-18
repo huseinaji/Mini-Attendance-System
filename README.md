@@ -23,6 +23,19 @@ root
 
 ---
 
+## 🔄 Alur Sistem
+
+1. User login (User dianggap employee) untuk mendapatkan access_token
+2. User melakukan **check-in** melalui frontend → API mencatat mem-publish event ke Redis Streams.
+3. Worker (Golang) membaca event → memproses →  simpan data checkin → update summary.
+4. User melihat status kehadiran realtime dari React.
+
+---
+
+## Diagram Sistem
+<img width="682" height="262" alt="Untitled Diagram drawio" src="https://github.com/user-attachments/assets/1a19b224-68fa-40d2-a0d8-d62bf8e2014d" />
+
+
 ## 🚀 Cara Menjalankan Project
 
 
@@ -86,17 +99,6 @@ Project ini menggunakan komponen berikut:
 * Dashboard absensi
 * Real-time status check-in/checkout
 * Rekap data
-
----
-
-## 🔄 Alur Sistem
-
-1. User login (User dianggap employee) untuk mendapatkan access_token
-2. User melakukan **check-in** melalui frontend → API mencatat mem-publish event ke Redis Streams.
-3. Worker (Golang) membaca event → memproses →  simpan data checkin → update summary.
-4. User melihat status kehadiran realtime dari React.
-
----
 
 ### Jalankan NestJS secara lokal
 
